@@ -1,6 +1,17 @@
-"""
-Pydantic data models for the VitalStackAssist application.
-"""
-from .supplements import Supplement
+"""Pydantic DTOs that define the calculator service's public request/response contracts."""
 
-__all__ = ["Supplement"]
+from .interaction import (
+	InteractionDetail,
+	NegativeInteractionDetail,
+	SupplementInteractionRequest,
+	SupplementInteractionResponse,
+)
+from .biomarkers import BiomarkerObservation
+
+__all__ = [
+	"BiomarkerObservation",
+	"InteractionDetail",
+	"NegativeInteractionDetail",
+	"SupplementInteractionRequest",
+	"SupplementInteractionResponse",
+]
