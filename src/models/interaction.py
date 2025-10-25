@@ -12,7 +12,6 @@ class SupplementInteractionRequest(BaseModel):
         ..., description="Canonical supplement names provided by the .NET system of record.", min_length=1
     )
 
-
 class InteractionDetail(BaseModel):
     """Shared structure for conveying a specific interaction insight."""
 
@@ -34,7 +33,6 @@ class NegativeInteractionDetail(InteractionDetail):
     recommendation: Optional[str] = Field(
         None, description="Guidance on how the user should adjust their protocol to reduce risk."
     )
-
 
 class SupplementInteractionResponse(BaseModel):
     """Normalized response payload returned to the .NET API for caching and user display."""

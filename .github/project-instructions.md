@@ -1,5 +1,8 @@
 # Supplement Optimizer Project Instructions
 
+## Important: This Repository
+**This repository (VitalStackAssist) is the Python AI Service - the "Calculator" component** that performs AI-powered supplement interaction analysis. It is a stateless service that receives supplement data from the .NET monolith, processes it using AI/ML models, and returns analysis results. It does NOT access the database directly.
+
 ## 1. Vision & Target User
 - **Vision:** Empower users to make safe, data-driven decisions about their supplement protocols.
 - **Target User:** "Optimizer Alex" – a data-driven individual managing a complex health and supplement regimen.

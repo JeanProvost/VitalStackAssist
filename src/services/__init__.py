@@ -6,7 +6,6 @@ from ..models import (
     SupplementInteractionResponse,
 )
 
-
 # Static reference data used to emulate the behavior of the downstream AI model. The .NET layer
 # is responsible for caching these responses. We keep them as DTO instances to ensure type safety
 # throughout the calculator.
