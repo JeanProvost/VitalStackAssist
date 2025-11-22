@@ -4,45 +4,41 @@
 from __future__ import annotations
 from typing import List, Optional
 from pydantic import BaseModel, Field
+from src.enums.management_strategy import ManagementStrategy
 
-class SupplementInteractionRequest(BaseModel):
-    """Canonical request from the .NET API describing a stack needing analysis."""
+class InteractionBase(BaseModel):
+    mechanism: str = Field(..., description="The biological rationale behind the interaction.")
+    evidence_level: str = Field(..., description="The strength of evidence supporting the interaction.")
+    source_url: Optional[str] = Field(None, description="URL to the source of the information.")
 
-    supplements: List[str] = Field(
-        ..., description="Canonical supplement names provided by the .NET system of record.", min_length=1
-    )
+class ConflictDetail(InteractionBase):
+    supplements: List[str] = Field(..., min_length=2, description="List of supplements currently interacting with the conflict.")
+    severity: str = Field(..., description="The severity level of the conflict.")
+    management_strategy: ManagementStrategy = Field(..., description="Recommended strategy to manage the conflict.")
+    management_instruction: str = Field(..., description="Detailed instructions for managing the conflict.")
 
-class InteractionDetail(BaseModel):
-    """Shared structure for conveying a specific interaction insight."""
+class SynergyDetail(InteractionBase):
+    supplements: List[str] = Field(..., min_length=2, description="List of supplements involved in the synergy.")
+    category: str = Field(..., description="The category of synergy (e.g., metabolic, immune).")
 
-    supplements: List[str] = Field(
-        ..., description="Subset of the request supplements involved in this interaction.", min_length=1
-    )
-    description: str = Field(..., description="Plain-language explanation of the interaction.")
-    evidence_level: Optional[str] = Field(
-        None, description="Optional maturity or strength descriptor supplied by the .NET backend."
-    )
-    source_url: Optional[str] = Field(
-        None, description="URL pointing to the evidence source used to support this interaction."
-    )
-
-class NegativeInteractionDetail(InteractionDetail):
-    """Extension of interaction detail with mitigation guidance for risky combinations."""
-
-    severity: Optional[str] = Field(None, description="Structured severity label defined by the .NET backend.")
-    recommendation: Optional[str] = Field(
-        None, description="Guidance on how the user should adjust their protocol to reduce risk."
-    )
+class DepletionDetail(BaseModel):
+    """Captures one-way nutrient depletion interactions between supplements."""
+    offending_supplement: str
+    depleted_nutrient: str
+    mechanism: str
+    severity: str
+    recommendation: str
 
 class SupplementInteractionResponse(BaseModel):
-    """Normalized response payload returned to the .NET API for caching and user display."""
+    """The full report cached by the .NET layer for supplement interaction analysis."""
+    meta: dict = Field(defult_factory=dict, description="Metadata about the analysis.")
+    analysis_summary: str = Field(..., description="A summary of the interaction analysis.")
 
-    summary: str = Field(..., description="High-level narrative summarizing the calculator findings.")
-    positive_interactions: List[InteractionDetail] = Field(
-        default_factory=list,
-        description="Evidence-backed synergies to highlight for the user interface.",
-    )
-    negative_interactions: List[NegativeInteractionDetail] = Field(
-        default_factory=list,
-        description="Warnings or conflicts that require the user's attention.",
-    )
+    interactions: struct_interactions
+
+class struct_interactions(BaseModel):
+    conficts: List[ConflictDetail] = Field(default_factory=list)
+    synergies: List[SynergyDetail] = Field(default_factory=list)
+    depletions: List[DepletionDetail] = Field(default_factory=list)
+    
+
