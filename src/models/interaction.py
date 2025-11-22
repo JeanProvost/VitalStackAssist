@@ -1,16 +1,9 @@
 """DTOs that define the request and response contracts for supplement interaction analysis.
-
-These models describe the payloads exchanged between the .NET orchestration layer and this
-stateless Python calculator service. No persistence-related concerns should leak into these
-structures—they are pure data contracts.
 """
 
 from __future__ import annotations
-
 from typing import List, Optional
-
 from pydantic import BaseModel, Field
-
 
 class SupplementInteractionRequest(BaseModel):
     """Canonical request from the .NET API describing a stack needing analysis."""
@@ -18,7 +11,6 @@ class SupplementInteractionRequest(BaseModel):
     supplements: List[str] = Field(
         ..., description="Canonical supplement names provided by the .NET system of record.", min_length=1
     )
-
 
 class InteractionDetail(BaseModel):
     """Shared structure for conveying a specific interaction insight."""
@@ -34,7 +26,6 @@ class InteractionDetail(BaseModel):
         None, description="URL pointing to the evidence source used to support this interaction."
     )
 
-
 class NegativeInteractionDetail(InteractionDetail):
     """Extension of interaction detail with mitigation guidance for risky combinations."""
 
@@ -42,7 +33,6 @@ class NegativeInteractionDetail(InteractionDetail):
     recommendation: Optional[str] = Field(
         None, description="Guidance on how the user should adjust their protocol to reduce risk."
     )
-
 
 class SupplementInteractionResponse(BaseModel):
     """Normalized response payload returned to the .NET API for caching and user display."""

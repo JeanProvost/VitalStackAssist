@@ -1,5 +1,3 @@
-"""Pydantic DTOs that define the calculator service's public request/response contracts."""
-
 from .interaction import (
 	InteractionDetail,
 	NegativeInteractionDetail,
