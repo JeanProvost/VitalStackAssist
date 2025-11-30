@@ -1,3 +1,4 @@
 from typing import Literal
 
-EvidenceLevel = Literal["theoretical", "emerging", "established"]
+EvidenceLevel = Literal["low", "moderate", "high", "very High"]
+
