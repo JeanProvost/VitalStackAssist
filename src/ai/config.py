@@ -19,8 +19,6 @@ class LLMProvider(str, Enum):
 
 
 class LLMSettings(BaseSettings):
-    """Runtime configuration for the LLM client abstraction."""
-
     provider: LLMProvider = Field(default=LLMProvider.LOCAL, alias="LLM_PROVIDER")
     timeout_seconds: float = Field(15.0, alias="LLM_TIMEOUT", ge=1.0)
     system_prompt: str = Field(
@@ -41,8 +39,8 @@ class LLMSettings(BaseSettings):
     bedrock_max_tokens: Optional[int] = Field(None, alias="BEDROCK_MAX_TOKENS", ge=1)
     bedrock_temperature: Optional[float] = Field(None, alias="BEDROCK_TEMPERATURE", ge=0.0, le=2.0)
 
-    # Local development provider settings (defaults assume an OpenAI-compatible proxy such as vLLM).
     local_model: str = Field(
+        #TODO Placeholder LLM
         default="meta-llama/Llama-3.1-8B-Instruct",
         alias="LOCAL_MODEL",
     )
@@ -53,7 +51,6 @@ class LLMSettings(BaseSettings):
 
     @model_validator(mode="after")
     def _validate_provider_specific_fields(self) -> "LLMSettings":
-        """Ensure provider-specific configuration is complete."""
 
         if self.provider == LLMProvider.OPENAI:
             missing: list[str] = []
@@ -78,8 +75,6 @@ class LLMSettings(BaseSettings):
         return self
 
     def resolved_model(self) -> str:
-        """Return the model identifier appropriate for the configured provider."""
-
         if self.provider == LLMProvider.OPENAI:
             assert self.openai_model is not None  # Guarded by validator.
             return self.openai_model
@@ -89,8 +84,6 @@ class LLMSettings(BaseSettings):
         return self.local_model
 
     def resolved_api_key(self) -> Optional[SecretStr]:
-        """Return the API key for providers that require one."""
-
         if self.provider == LLMProvider.OPENAI:
             return self.openai_api_key
         if self.provider == LLMProvider.LOCAL:
@@ -98,8 +91,6 @@ class LLMSettings(BaseSettings):
         return None
 
     def resolved_api_base(self) -> Optional[str]:
-        """Return the base URL for HTTP-based providers."""
-
         if self.provider == LLMProvider.OPENAI:
             return self.openai_api_base
         if self.provider == LLMProvider.LOCAL:
