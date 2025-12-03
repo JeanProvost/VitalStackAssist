@@ -1,15 +1,17 @@
 from .interaction import (
-	InteractionDetail,
-	NegativeInteractionDetail,
-	SupplementInteractionRequest,
-	SupplementInteractionResponse,
+    ConflictDetail,
+    SynergyDetail,
+    DepletionDetail,
+    SupplementInteractionRequest,
+    SupplementInteractionResponse,
 )
 from .biomarkers import BiomarkerObservation
 
 __all__ = [
-	"BiomarkerObservation",
-	"InteractionDetail",
-	"NegativeInteractionDetail",
-	"SupplementInteractionRequest",
-	"SupplementInteractionResponse",
+    "BiomarkerObservation",
+    "ConflictDetail",
+    "SynergyDetail",
+    "DepletionDetail",
+    "SupplementInteractionRequest",
+    "SupplementInteractionResponse",
 ]
