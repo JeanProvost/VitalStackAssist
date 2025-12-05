@@ -88,8 +88,12 @@ class LLMClient:
         if response_format:
             payload["response_format"] = response_format
 
-        url = "/v1/chat/completions"
-        if self._settings.resolved_api_base() is None:
+        # If a custom API base is set, the client has a base_url.
+        # We assume the base_url includes the version (e.g., /v1), so we just append the endpoint.
+        # If no custom base is set, we use the full OpenAI URL.
+        if self._settings.resolved_api_base():
+            url = "chat/completions"
+        else:
             url = "https://api.openai.com/v1/chat/completions"
 
         response = self._http_client.post(url, json=payload, headers=headers)
