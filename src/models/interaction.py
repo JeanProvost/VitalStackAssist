@@ -6,7 +6,7 @@ from typing import List, Optional
 from pydantic import BaseModel, Field
 from src.enums.management_strategy import ManagementStrategy
 from src.enums.evidence_level import EvidenceLevel
-from src.enums.severity_level import SeverityyLevel
+from src.enums.severity_level import SeverityLevel
 from src.enums.synergy_category import SynergyCategory
 from src.enums.depletion_severity import DepletionSeverity
 
@@ -17,7 +17,7 @@ class InteractionBase(BaseModel):
 
 class ConflictDetail(InteractionBase):
     supplements: List[str] = Field(..., min_length=2, description="List of supplements currently interacting with the conflict.")
-    severity: SeverityyLevel = Field(..., description="Severity level of the conflict.")
+    severity: SeverityLevel = Field(..., description="Severity level of the conflict.")
     management_strategy: ManagementStrategy = Field(..., description="Recommended strategy to manage the conflict.")
     management_instruction: str = Field(..., description="Detailed instructions for managing the conflict.")
 
@@ -33,7 +33,7 @@ class DepletionDetail(BaseModel):
     severity: DepletionSeverity = Field(..., description="Severity level of the depletion.")
     recommendation: str = Field(..., description="Recommended action to address the depletion.")
 
-class OptimizationSuggettion(BaseModel):
+class OptimizationSuggestion(BaseModel):
     """Bioavailability or form-specific suggestion(the optimizer feature)"""
     supplement: str = Field(..., description="The supplement for which the suggestion is made.")
     suggested_form: str = Field(..., description="The suggested form of the supplement for better efficacy.")
@@ -43,21 +43,24 @@ class DosageWarning(BaseModel):
     """Dosage warning for a specific supplement."""
     supplement: str = Field(..., description="The supplement for which the dosage warning is issued.")
     warning: str = Field(..., description="The dosage warning message.")    
+
+class struct_interactions(BaseModel):
+    conflicts: List[ConflictDetail] = Field(default_factory=list)
+    synergies: List[SynergyDetail] = Field(default_factory=list)
+    depletions: List[DepletionDetail] = Field(default_factory=list)
+    
+    optimizations: List[OptimizationSuggestion] = Field(default_factory=list)
+    dosage_warnings: List[DosageWarning] = Field(default_factory=list)
+
+    meta: dict = Field(default_factory=dict, description="Metadata about the interactions.")
+
 class SupplementInteractionResponse(BaseModel):
     """The full report cached by the .NET layer for supplement interaction analysis."""
-    meta: dict = Field(defult_factory=dict, description="Metadata about the analysis.")
+    meta: dict = Field(default_factory=dict, description="Metadata about the analysis.")
     analysis_summary: str = Field(..., description="A summary of the interaction analysis.")
 
     interactions: struct_interactions
 
-class struct_interactions(BaseModel):
-    conficts: List[ConflictDetail] = Field(default_factory=list)
-    synergies: List[SynergyDetail] = Field(default_factory=list)
-    depletions: List[DepletionDetail] = Field(default_factory=list)
-    
-    optimizations: List[OptimizationSuggettion] = Field(default_factory=list)
-    dosage_warnings: List[DosageWarning] = Field(default_factory=list)
-
-    meta: dict = Field(defult_factory=dict, description="Metadata about the interactions.")
-    
-
+class SupplementInteractionRequest(BaseModel):
+    """Request model for supplement interaction analysis."""
+    supplements: List[str] = Field(..., description="List of supplements to analyze.")
