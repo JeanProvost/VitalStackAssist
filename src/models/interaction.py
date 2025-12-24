@@ -10,6 +10,7 @@ from src.enums.severity_level import SeverityLevel
 from src.enums.synergy_category import SynergyCategory
 from src.enums.depletion_severity import DepletionSeverity
 
+#Base interaction Models ---
 class InteractionBase(BaseModel):
     mechanism: str = Field(..., description="The biological rationale behind the interaction.")
     evidence_level: EvidenceLevel = Field(..., description="The level of evidence supporting the interaction.") 
