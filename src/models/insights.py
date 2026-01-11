@@ -1,3 +1,7 @@
+from enum import Enum
+from typing import List, Optional
+from pydantic import BaseModel, Field
+
 class InsightType(str, Enum):
     CORRELATION = "correlation"
     STREAK = "streak"
