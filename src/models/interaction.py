@@ -12,10 +12,12 @@ from src.enums.depletion_severity import DepletionSeverity
 
 #Base interaction Models ---
 class InteractionBase(BaseModel):
+    supplements: List[str] = Field(..., min_length=2, description="List of supplements involved in the interaction.")
     mechanism: str = Field(..., description="The biological rationale behind the interaction.")
-    evidence_level: EvidenceLevel = Field(..., description="The level of evidence supporting the interaction.") 
-    source_url: Optional[str] = Field(None, description="URL to the source of the information.")
-
+    evidence_level: Literal["low", "medium", "high", "inconclusive"] = Field(
+        "moderate", description="The strength of clinical evidence"
+    )
+    source_url: Optional[str] = Field(None)
 class ConflictDetail(InteractionBase):
     supplements: List[str] = Field(..., min_length=2, description="List of supplements currently interacting with the conflict.")
     severity: SeverityLevel = Field(..., description="Severity level of the conflict.")
@@ -23,8 +25,7 @@ class ConflictDetail(InteractionBase):
     management_instruction: str = Field(..., description="Detailed instructions for managing the conflict.")
 
 class SynergyDetail(InteractionBase):
-    supplements: List[str] = Field(..., min_length=2, description="List of supplements involved in the synergy.")
-    category: SynergyCategory = Field(..., description="Category of the synergy.")
+    category: Optional[str] = Field(None, description="Category of the synergy.")
 
 class DepletionDetail(BaseModel):
     """Captures one-way nutrient depletion interactions between supplements."""
@@ -45,14 +46,14 @@ class DosageWarning(BaseModel):
     supplement: str = Field(..., description="The supplement for which the dosage warning is issued.")
     warning: str = Field(..., description="The dosage warning message.")    
 
+# --- Main Reponse Model ---
+
 class struct_interactions(BaseModel):
-    conflicts: List[ConflictDetail] = Field(default_factory=list)
+    conflicts: List[InteractionBase] = Field(default_factory=list)
     synergies: List[SynergyDetail] = Field(default_factory=list)
     depletions: List[DepletionDetail] = Field(default_factory=list)
-    
     optimizations: List[OptimizationSuggestion] = Field(default_factory=list)
     dosage_warnings: List[DosageWarning] = Field(default_factory=list)
-
     meta: dict = Field(default_factory=dict, description="Metadata about the interactions.")
 
 class SupplementInteractionResponse(BaseModel):
