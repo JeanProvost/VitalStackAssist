@@ -2,7 +2,7 @@
 """
 
 from __future__ import annotations
-from typing import List, Optional
+from typing import List, Optional, Literal
 from pydantic import BaseModel, Field
 from src.enums.management_strategy import ManagementStrategy
 from src.enums.evidence_level import EvidenceLevel
