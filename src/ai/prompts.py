@@ -2,10 +2,8 @@
 
 from __future__ import annotations
 
-from typing import Iterable
-
-from ..models import SupplementInteractionRequest
-
+from typing import Iterable, Optional
+from models import SupplementInteractionRequest
 INTERACTION_ANALYSIS_SCHEMA = """
 {
    "analysis_summary": {
@@ -53,7 +51,7 @@ INTERACTION_ANALYSIS_SCHEMA = """
 """
 
 def build_interaction_prompt(
-        request: SuppplementInteractionRequest, *, biomarkers: Iterable[str] | None = None
+        request: SupplementInteractionRequest, *, biomarkers: Optional[Iterable[str]] = None
     ) -> str:
     """
     Compose the promnpt
