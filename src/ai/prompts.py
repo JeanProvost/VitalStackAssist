@@ -3,16 +3,16 @@
 from __future__ import annotations
 
 from typing import Iterable, Optional
-from models import SupplementInteractionRequest
+from ..models import SupplementInteractionRequest
 INTERACTION_ANALYSIS_SCHEMA = """
 {
-   "analysis_summary": {
+   "analysis_summary": "A 2-3 sentence executive summary of the interaction. Do NOT just say 'interactions'.",{
         "interactions": {
             "conflicts": [
                 {
                     "supplements": ["string", "string"],
                     "mechanism": "string",
-                    "evidence_level": "low|medium|high|inconclusive",
+                    "evidence_level": "low|moderate|high|inconclusive",
                     "source_url": "string (optional)",
                 }
             ],
@@ -20,7 +20,7 @@ INTERACTION_ANALYSIS_SCHEMA = """
                 {
                     "supplements": ["string", "string"],
                     "mechanism": "string",
-                    "evidence_level": "low|medium|high|inconclusive",
+                    "evidence_level": "low|moderate|high|inconclusive",
                     "category": "string (optional)",
                     "source_url": "string (optional)",
                 }
@@ -30,7 +30,7 @@ INTERACTION_ANALYSIS_SCHEMA = """
                     "offending_supplement": "string",
                     "depleted_nutrient": "string",
                     "mechanism": "string",
-                    "severity": "minor|moderate|severe",
+                    "severity": "low|moderate|high",
                     "recommendation": "string",
                 }
             ],
@@ -39,10 +39,11 @@ INTERACTION_ANALYSIS_SCHEMA = """
                     "supplement": "string",
                     "suggested_form": "string",
                     "rationale": "string",
-                } ], "dosage_warnings": [ {
-                    "supplement": "string",
-                    "warning": "string",
-                }
+                } ],
+            "dosage_warnings": [ {
+                "supplement": "string",
+                "warning": "string",
+            }
             ]
         },
         "meta": {}
@@ -60,8 +61,20 @@ def build_interaction_prompt(
 
     lines = [
         "Role: You are an expert clinical pharmacologist and nutritionist specializing in supplement interactions.",
-        "Task: Evaluate the following supplement stack for clinically relevant interactions, nutrient depletions, and optimization suggestions.", 
+        "Task: Identify the CLINICALLY RELEVANT interactions that require intervention.", 
+        "",
+        "### User's Supplement Stack:"
         "Supplements:\n" + supplement_list,   
+        "",
+        "### CRITICAL Rules for Anaslysis:",
+        "1. IGNORE THEORETICAL CONFLICTS: Do not report 'conflicts' based solely on in-vitro (test tube) chemistry if the combination is standard in clinial practice.",
+        "2. FORMS MATTER: When suggesting optimizations, specify chemical forms (e.g., 'magnesium citrate' vs 'magnesium')"
+        "3. SUMMARY IS MANDATORY: The 'anaylsis_summary' field must be a helpful paragraph, not a single word.",
+        "4. DEPLETIONS: Check if any supplement depletes nutrients (e.g., Diuretics -> potassium, Zinc -> Copper).",
+        "",
+        "### Output Format:",
+        "You must output valid JSON strictly adhering to this schema:",
+        INTERACTION_ANALYSIS_SCHEMA
     ]
     
     if biomarkers:

@@ -3,7 +3,7 @@
 
 from __future__ import annotations
 from typing import List, Optional, Literal
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from src.enums.management_strategy import ManagementStrategy
 from src.enums.evidence_level import EvidenceLevel
 from src.enums.severity_level import SeverityLevel
@@ -14,10 +14,24 @@ from src.enums.depletion_severity import DepletionSeverity
 class InteractionBase(BaseModel):
     supplements: List[str] = Field(..., min_length=2, description="List of supplements involved in the interaction.")
     mechanism: str = Field(..., description="The biological rationale behind the interaction.")
-    evidence_level: Literal["low", "medium", "high", "inconclusive"] = Field(
+    evidence_level: Literal["low", "moderate", "high", "inconclusive"] = Field(
         "moderate", description="The strength of clinical evidence"
     )
     source_url: Optional[str] = Field(None)
+    
+    @field_validator('evidence_level', mode='before')
+    @classmethod
+    def normalize_evidence(cls, v):
+        if isinstance(v, str):
+            v = v.lower().strip()
+            if v in ["medium", "average", "fair",]:
+                return "moderate"
+            if v in ["strong", "very strong", "robust", 'established']:
+                return "high"
+            if v in ["weak", "limited", "poor", "minor", "insufficient", "weak"]:
+                return "low"
+        return v
+                
 class ConflictDetail(InteractionBase):
     supplements: List[str] = Field(..., min_length=2, description="List of supplements currently interacting with the conflict.")
     severity: SeverityLevel = Field(..., description="Severity level of the conflict.")
@@ -34,6 +48,19 @@ class DepletionDetail(BaseModel):
     mechanism: str = Field(..., description="The biological rationale behind the depletion.")
     severity: DepletionSeverity = Field(..., description="Severity level of the depletion.")
     recommendation: str = Field(..., description="Recommended action to address the depletion.")
+    
+    @field_validator('severity', mode='before')
+    @classmethod
+    def normalize_severity(cls, v):
+        if isinstance(v, str):
+            v = v.lower().strip()
+            if v in ["minor", "negligible", "mild"]:
+                return "low"
+            if v in ["medium", "average"]:
+                return "moderate"
+            if v in ["severe", "dangerous", "serious", "significant", "critical"]:
+                return "high"
+        return v
 
 class OptimizationSuggestion(BaseModel):
     """Bioavailability or form-specific suggestion(the optimizer feature)"""
