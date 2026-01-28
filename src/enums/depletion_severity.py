@@ -1,3 +1,3 @@
 from typing import Literal
 
-DepletionSeverity = Literal["minor", "moderate", "severe"]
+DepletionSeverity = Literal["low", "moderate", "high"]
