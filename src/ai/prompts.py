@@ -52,31 +52,30 @@ INTERACTION_ANALYSIS_SCHEMA = """
 """
 
 def build_interaction_prompt(
-        request: SupplementInteractionRequest, *, biomarkers: Optional[Iterable[str]] = None
-    ) -> str:
-    """
-    Compose the promnpt
-    """
-    supplement_list = "\n".join(f"-{name}" for name in request.supplements)
+    request: SupplementInteractionRequest, *, biomarkers: Optional[Iterable[str]] = None
+) -> str:
+    """Compose the textual prompt for pairwise supplement interaction analysis."""
+
+    compound_a, compound_b = request.supplements[0], request.supplements[1]
 
     lines = [
         "Role: You are an expert clinical pharmacologist and nutritionist specializing in supplement interactions.",
-        "Task: Identify the CLINICALLY RELEVANT interactions that require intervention.", 
-        "",
-        "### User's Supplement Stack:"
-        "Supplements:\n" + supplement_list,   
-        "",
-        "### CRITICAL Rules for Anaslysis:",
-        "1. IGNORE THEORETICAL CONFLICTS: Do not report 'conflicts' based solely on in-vitro (test tube) chemistry if the combination is standard in clinial practice.",
-        "2. FORMS MATTER: When suggesting optimizations, specify chemical forms (e.g., 'magnesium citrate' vs 'magnesium')"
-        "3. SUMMARY IS MANDATORY: The 'anaylsis_summary' field must be a helpful paragraph, not a single word.",
-        "4. DEPLETIONS: Check if any supplement depletes nutrients (e.g., Diuretics -> potassium, Zinc -> Copper).",
+        f"Task: Analyze ONLY the direct pharmacological, pharmacokinetic, and pharmacodynamic interactions between {compound_a} and {compound_b}.",
+        "Focus strictly on this pair—ignore the rest of the user's stack.",
+        "Report both positive synergies and negative conflicts that have clinical relevance.",
+        "Rules:",
+        "1) Clinical relevance: ignore purely theoretical or in-vitro concerns unless supported by clinical data or dosing reality.",
+        "2) Evidence discipline: set 'evidence_level' realistically; cite mechanisms only when defensible; never hallucinate sources.",
+        "3) Form specificity: when suggesting optimizations, name the chemical form (e.g., citrate vs oxide).",
+        "4) Depletions: flag nutrient depletions caused by either compound and provide a practical recommendation.",
+        "5) Summary required: 'analysis_summary' must be a concise paragraph (2-3 sentences), not a single word.",
+        "6) Output hygiene: respond with JSON only—no prose outside the JSON.",
         "",
         "### Output Format:",
         "You must output valid JSON strictly adhering to this schema:",
         INTERACTION_ANALYSIS_SCHEMA
     ]
-    
+
     if biomarkers:
         lines.append("")
         lines.append("### User's Known Biomarker Issues (Consider these high priority):")
