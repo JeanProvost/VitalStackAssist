@@ -92,4 +92,10 @@ class SupplementInteractionResponse(BaseModel):
 
 class SupplementInteractionRequest(BaseModel):
     """Request model for supplement interaction analysis."""
-    supplements: List[str] = Field(..., description="List of supplements to analyze.")
+    
+    supplements: List[str] = Field(
+        ...,
+        description="List of supplemenmts in the stack to analyze for interactions.",
+        min_length=2,
+        max_length=2,
+    )
